@@ -6,6 +6,14 @@ const cron = require("node-cron");
 const app = express();
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.send("Servidor funcionando");
+});
+
+app.get("/webhook", (req, res) => {
+  res.send("Webhook activo");
+});
+
 // 🔑 TU ADMIN API KEY (Ghost)
 const ADMIN_API_KEY = "69dc070577f04a0001471c77:c416777f8545b70941afac9e7a1f7eb0c0e1b5c3514e451f28dc0e343567fa54";
 
