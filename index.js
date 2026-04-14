@@ -46,20 +46,21 @@ app.post("/webhook", async (req, res) => {
 
     const token = generateToken();
 
-    await axios.put(
-      `${GHOST_URL}/ghost/api/admin/members/${memberId}/`,
-      {
-        members: [
-          {
-            tiers: [TIER_ID]
-          }
-        ]
-      },
-      {
-        headers: {
-          Authorization: `Ghost ${token}`
+    await axios.post(
+        `${GHOST_URL}/ghost/api/admin/members/${memberId}/subscriptions/`,
+    {
+        subscriptions: [
+        {
+            tier: TIER_ID,
+            status: "active"
         }
-      }
+        ]
+    },
+    {
+        headers: {
+        Authorization: `Ghost ${token}`
+        }
+    }
     );
 
     console.log("Trial (tier) asignado a:", memberId);
@@ -72,7 +73,7 @@ app.post("/webhook", async (req, res) => {
   }
 });
 
-//CRON → QUITAR TIER DESPUÉS DE 30 DÍAS
+//CRON → quitar trial después de 30 días
 cron.schedule("0 0 * * *", async () => {
   console.log("Revisando trials...");
 
@@ -95,26 +96,21 @@ cron.schedule("0 0 * * *", async () => {
       const created = new Date(member.created_at);
       const diffDays = (now - created) / (1000 * 60 * 60 * 24);
 
-      const hasTier = member.subscriptions?.length > 0;
+      const hasSubscription = member.subscriptions?.length > 0;
 
-      if (hasTier && diffDays >= 30) {
+      if (hasSubscription && diffDays >= 30) {
         console.log("Quitando trial a:", member.email);
 
-        await axios.put(
-          `${GHOST_URL}/ghost/api/admin/members/${member.id}/`,
-          {
-            members: [
-              {
-                tiers: []
+        for (let sub of member.subscriptions) {
+          await axios.delete(
+            `${GHOST_URL}/ghost/api/admin/members/${member.id}/subscriptions/${sub.id}/`,
+            {
+              headers: {
+                Authorization: `Ghost ${token}`
               }
-            ]
-          },
-          {
-            headers: {
-              Authorization: `Ghost ${token}`
             }
-          }
-        );
+          );
+        }
       }
     }
 
