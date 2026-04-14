@@ -35,36 +35,31 @@ app.get("/webhook", (req, res) => {
 //WEBHOOK → ASIGNAR TIER (TRIAL)
 app.post("/webhook", async (req, res) => {
   try {
-    console.log("Webhook recibido:", JSON.stringify(req.body, null, 2));
-
-    const memberId = req.body.member?.current?.id || req.body.member?.id;
-
-    if (!memberId) {
-      console.log("No se encontró memberId");
-      return res.status(400).send("No member ID");
-    }
+    const memberId = req.body.member.current.id;
 
     const token = generateToken();
 
     await axios.post(
-        `${GHOST_URL}/ghost/api/admin/members/${memberId}/subscriptions/`,
-    {
+      `${GHOST_URL}/ghost/api/admin/members/${memberId}/subscriptions/`,
+      {
         subscriptions: [
-        {
-            tier: TIER_ID,
+          {
+            tier: {
+              id: TIER_ID
+            },
             status: "active"
-        }
+          }
         ]
-    },
-    {
+      },
+      {
         headers: {
-        Authorization: `Ghost ${token}`
+          Authorization: `Ghost ${token}`,
+          "Content-Type": "application/json"
         }
-    }
+      }
     );
 
-    console.log("Trial (tier) asignado a:", memberId);
-
+    console.log("Trial agregado a:", memberId);
     res.send("OK");
 
   } catch (error) {
