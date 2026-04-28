@@ -38,14 +38,12 @@ app.post("/webhook", async (req, res) => {
 
     const token = generateToken();
 
-    //SUSCRIPCIÓN COMPED
-    await axios.post(
-      `${GHOST_URL}/ghost/api/admin/members/${memberId}/subscriptions/`,
+    await axios.put(
+      `${GHOST_URL}/ghost/api/admin/members/${memberId}/`,
       {
-        subscriptions: [
+        tiers: [
           {
-            status: "active",
-            comped: true
+            id: "69779b4c4d08f00008e7bce8" // 👈 TU TIER "Pruebas"
           }
         ]
       },
@@ -57,11 +55,11 @@ app.post("/webhook", async (req, res) => {
       }
     );
 
-    console.log("Trial asignado (miembro PAID temporal)");
+    console.log("✅ Usuario convertido a PAID (trial)");
     res.send("OK");
 
   } catch (error) {
-    console.log("ERROR:", error.response?.data || error.message);
+    console.log("❌ ERROR:", error.response?.data || error.message);
     res.status(500).send("Error");
   }
 });
