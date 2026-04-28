@@ -24,7 +24,7 @@ function generateToken() {
   });
 }
 
-//WEBHOOK
+//WEBHOOK → DAR TRIAL (PAID TEMPORAL)
 app.post("/webhook", async (req, res) => {
   try {
     console.log("Datos recibidos:", JSON.stringify(req.body, null, 2));
@@ -38,13 +38,14 @@ app.post("/webhook", async (req, res) => {
 
     const token = generateToken();
 
-    await axios.put(
-      `${GHOST_URL}/ghost/api/admin/members/${memberId}/?source=html`,
+    //SUSCRIPCIÓN COMPED
+    await axios.post(
+      `${GHOST_URL}/ghost/api/admin/members/${memberId}/subscriptions/`,
       {
-        members: [
+        subscriptions: [
           {
-            id: memberId,
-            labels: ["trial"]
+            status: "active",
+            comped: true
           }
         ]
       },
@@ -56,7 +57,7 @@ app.post("/webhook", async (req, res) => {
       }
     );
 
-    console.log("Trial asignado correctamente");
+    console.log("Trial asignado (miembro PAID temporal)");
     res.send("OK");
 
   } catch (error) {
