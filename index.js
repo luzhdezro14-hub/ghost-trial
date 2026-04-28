@@ -41,9 +41,14 @@ app.post("/webhook", async (req, res) => {
     await axios.put(
       `${GHOST_URL}/ghost/api/admin/members/${memberId}/`,
       {
-        tiers: [
+        members: [
           {
-            id: "69779b4c4d08f00008e7bce8" // 👈 TU TIER "Pruebas"
+            id: memberId,
+            tiers: [
+              {
+                id: "69779b4c4d08f00008e7bce8"
+              }
+            ]
           }
         ]
       },
